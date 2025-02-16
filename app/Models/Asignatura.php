@@ -27,6 +27,6 @@ class Asignatura extends Model
     // Una asignatura tiene muchos alumnos
     public function alumnos()
     {
-        return $this->hasMany(Alumno::class, 'id_asig');
+        return $this->belongsToMany(Alumno::class, 'alumno_asignatura', 'id_asig', 'id_alum');
     }
 }

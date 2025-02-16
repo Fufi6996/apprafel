@@ -16,5 +16,4 @@ class Aula extends Model
     {
         return $this->belongsTo(Asignatura::class, 'id_asig');
     }
-    //
 }
