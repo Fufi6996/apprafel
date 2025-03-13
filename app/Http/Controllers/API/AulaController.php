@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Aula;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
 class AulaController extends Controller
 {
@@ -18,41 +20,67 @@ class AulaController extends Controller
    // POST /api/aulas (Crear)
    public function store(Request $request)
    {
-       $request->validate([
-           'nom_aula' => 'required|string|max:50',
-           'id_asig' => 'required|exists:asignaturas,id',
-       ]);
+       try {
+           $request->validate([
+               'nom_aula' => 'required|string|max:50',
+               'id_asig' => 'required|exists:asignaturas,id',
+           ]);
 
-       $aula = Aula::create($request->all());
-       return response()->json($aula, 201);
+           $aula = Aula::create($request->all());
+           return response()->json($aula, 201);
+       } catch (ValidationException $e) {
+           return response()->json(['error' => $e->errors()], 422);
+       } catch (\Exception $e) {
+           return response()->json(['error' => 'Error al crear el aula'], 500);
+       }
    }
 
    // GET /api/aulas/{id} (Mostrar una)
    public function show($id)
    {
-       $aula = Aula::with('asignatura')->findOrFail($id);
-       return response()->json($aula);
+       try {
+           $aula = Aula::with('asignatura')->findOrFail($id);
+           return response()->json($aula);
+       } catch (ModelNotFoundException $e) {
+           return response()->json(['error' => 'Aula no encontrada'], 404);
+       } catch (\Exception $e) {
+           return response()->json(['error' => 'Error al mostrar el aula'], 500);
+       }
    }
 
    // PUT /api/aulas/{id} (Actualizar)
    public function update(Request $request, $id)
    {
-       $aula = Aula::findOrFail($id);
+       try {
+           $aula = Aula::findOrFail($id);
 
-       $request->validate([
-           'nom_aula' => 'sometimes|string|max:50',
-           'id_asig' => 'sometimes|exists:asignaturas,id',
-       ]);
+           $request->validate([
+               'nom_aula' => 'sometimes|string|max:50',
+               'id_asig' => 'sometimes|exists:asignaturas,id',
+           ]);
 
-       $aula->update($request->all());
-       return response()->json($aula);
+           $aula->update($request->all());
+           return response()->json($aula);
+       } catch (ModelNotFoundException $e) {
+           return response()->json(['error' => 'Aula no encontrada'], 404);
+       } catch (ValidationException $e) {
+           return response()->json(['error' => $e->errors()], 422);
+       } catch (\Exception $e) {
+           return response()->json(['error' => 'Error al actualizar el aula'], 500);
+       }
    }
 
    // DELETE /api/aulas/{id} (Eliminar)
    public function destroy($id)
    {
-       $aula = Aula::findOrFail($id);
-       $aula->delete();
-       return response()->json(null, 204);
+       try {
+           $aula = Aula::findOrFail($id);
+           $aula->delete();
+           return response()->json(null, 204);
+       } catch (ModelNotFoundException $e) {
+           return response()->json(['error' => 'Aula no encontrada'], 404);
+       } catch (\Exception $e) {
+           return response()->json(['error' => 'Error al eliminar el aula'], 500);
+       }
    }
 }

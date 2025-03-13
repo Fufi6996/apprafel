@@ -38,8 +38,14 @@ class AsignaturaController extends Controller
    // GET /api/asignaturas/{id} (Mostrar una)
    public function show($id)
    {
-       $asignatura = Asignatura::with(['profesor', 'aulas', 'alumnos'])->findOrFail($id);
-       return response()->json($asignatura);
+       try {
+           $asignatura = Asignatura::with(['profesor', 'aulas', 'alumnos'])->findOrFail($id);
+           return response()->json($asignatura);
+       } catch (ModelNotFoundException $e) {
+           return response()->json(['error' => 'Asignatura no encontrada'], 404);
+       } catch (\Exception $e) {
+           return response()->json(['error' => 'Error al mostrar la asignatura'], 500);
+       }
    }
 
    // PUT /api/asignaturas/{id} (Actualizar)
