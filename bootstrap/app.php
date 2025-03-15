@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(\App\Http\Middleware\ForceJsonResponse::class);
+        $middleware->append(\App\Http\Controllers\Middleware\ForceJsonResponse::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (ModelNotFoundException $e, Request $request) {
