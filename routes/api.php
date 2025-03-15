@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Http\Controllers\AuthController;
+
 Route::apiResource('profesores', ProfesorController::class);
 Route::apiResource('asignaturas', AsignaturaController::class);
 Route::apiResource('aulas', AulaController::class);
@@ -19,8 +21,17 @@ Route::middleware('api')->group(function () {
 
     // Protegiu les rutes que modifiquen dades amb auth:sanctum
     Route::middleware('auth:sanctum')->group(function () {
+
+        Route::apiResource('profesores', ProfesorController::class);
+        Route::apiResource('asignaturas', AsignaturaController::class);
+        Route::apiResource('aulas', AulaController::class);
+        Route::apiResource('alumnos', AlumnoController::class);
+
         // Endpoint per crear una nova aula: POST /aulas
         Route::post('aulas', [AulaController::class, 'store']);
+
+        // Endpoint per crear una nova aula: POST /aulas
+        Route::post('/login', [AuthController::class, 'login']);
 
         // Endpoint per afegir un alumno a una aula: POST /aulas/{aula}/alumnos
         Route::post('aulas/{aula}/alumnos', [AulaController::class, 'addalumno']);
